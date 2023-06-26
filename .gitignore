@@ -1,0 +1,18 @@
+# Misc
+.DS_Store
+*.bak
+*.log
+*.swp
+
+# IntelliJ
+.idea/
+*.iml
+
+# Node
+node_modules/
+/packages/*/dist/
+/packages/*/coverage/
+/test-results
+
+# dotenv
+.env

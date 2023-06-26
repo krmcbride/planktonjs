@@ -1,0 +1,22 @@
+{
+  "name": "@krmcbride/plankton-data-commons",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "repository": "https://github.com/krmcbride/plankton",
+  "publishConfig": {
+    "@krmcbride:registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run build-ts",
+    "build-ts": "tsc",
+    "clean": "rimraf ./dist"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
+  }
+}

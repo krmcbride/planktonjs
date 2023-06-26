@@ -1,0 +1,31 @@
+{
+  "name": "@krmcbride/plankton",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "repository": "https://github.com/krmcbride/plankton",
+  "publishConfig": {
+    "@krmcbride:registry": "https://npm.pkg.github.com"
+  },
+  "dependencies": {
+    "@krmcbride/plankton-emitter": "^1.0.0",
+    "@krmcbride/plankton-environment": "^1.0.0",
+    "@krmcbride/plankton-express": "^1.0.0",
+    "@krmcbride/plankton-graphql": "^1.0.0",
+    "@krmcbride/plankton-health": "^1.0.0",
+    "@krmcbride/plankton-logger": "^1.0.0",
+    "tslib": "^2.3.1"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run build-ts",
+    "build-ts": "tsc",
+    "clean": "rimraf ./dist"
+  }
+}
