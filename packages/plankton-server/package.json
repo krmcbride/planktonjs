@@ -1,0 +1,46 @@
+{
+  "name": "@krmcbride/plankton-server",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "bin/",
+    "dist/"
+  ],
+  "bin": {
+    "plankton-server": "./bin/server.js"
+  },
+  "repository": "https://github.com/krmcbride/planktonjs",
+  "publishConfig": {
+    "@krmcbride:registry": "https://npm.pkg.github.com"
+  },
+  "dependencies": {
+    "@godaddy/terminus": "^4.10.2",
+    "@krmcbride/plankton-emitter": "^1.0.0",
+    "@krmcbride/plankton-environment": "^1.0.0",
+    "@krmcbride/plankton-express": "^1.0.0",
+    "@krmcbride/plankton-health": "^1.0.0",
+    "@krmcbride/plankton-logger": "^1.0.0",
+    "@types/stoppable": "^1.1.1",
+    "bluebird": "^3.7.2",
+    "tslib": "^2.3.1"
+  },
+  "peerDependencies": {
+    "express": "^4.17.3",
+    "graphql": "^15.8.0",
+    "prom-client": "^14.0.1",
+    "reflect-metadata": "^0.1.13"
+  },
+  "peerDependenciesMeta": {},
+  "devDependencies": {
+    "@types/bluebird": "^3.5.36",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express-pino-logger": "^4.0.3"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run build-ts",
+    "build-ts": "tsc",
+    "clean": "rimraf ./dist"
+  }
+}
