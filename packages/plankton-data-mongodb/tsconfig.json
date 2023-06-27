@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*test.ts"],
+  "references": [
+    { "path": "../plankton-data-commons" },
+    { "path": "../plankton-emitter" },
+    { "path": "../plankton-health" },
+    { "path": "../plankton-logger" }
+  ]
+}
