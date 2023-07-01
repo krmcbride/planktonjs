@@ -20,7 +20,7 @@
     "@krmcbride/plankton-emitter": "^1.0.0",
     "@krmcbride/plankton-health": "^1.0.0",
     "@krmcbride/plankton-logger": "^1.0.0",
-    "amqp-connection-manager": "^1.0.0",
+    "amqp-connection-manager": "^4.1.1",
     "amqplib": "^0.8.0",
     "tslib": "^2.3.1"
   },
