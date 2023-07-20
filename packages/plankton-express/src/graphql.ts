@@ -1,6 +1,9 @@
-import { ApolloServer } from 'apollo-server-express';
+import { json } from 'body-parser';
+import cors from 'cors';
 import type { Application, Request, Response } from 'express';
-import type { GraphQLError, GraphQLSchema } from 'graphql';
+import type { GraphQLSchema } from 'graphql';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
 import { emitter } from '@krmcbride/plankton-emitter';
 import { LoggerFactory } from '@krmcbride/plankton-logger';
 import { accessMiddlewareChainFactory } from './auth/access-middleware-chain-factory';
@@ -64,6 +67,11 @@ class RequestContext implements Context {
   }
 }
 
+/*
+note -- error remapping is disabled due to breaking changes in the latest
+type-graphql, this needs another look
+
+
 // See if there is a `code` string on the Error, otherwise use its `name`, else
 // just leave the default. Copy the Error name and message to the extensions
 // hash if those properties don't already exist
@@ -91,6 +99,7 @@ const remapError = (graphQlError: GraphQLError) => {
   // eslint-disable-next-line no-param-reassign
   graphQlError.extensions.message = message;
 };
+*/
 
 // eslint-disable-next-line import/prefer-default-export
 export const createGraphqlServer = async (
@@ -98,19 +107,18 @@ export const createGraphqlServer = async (
   schema: GraphQLSchema,
 ): Promise<ApolloServer> => {
   const server = new ApolloServer({
-    // Always include stack traces in errors
-    debug: true,
-    context: ({ req, res }): Context => new RequestContext(req, res),
-    formatError: (graphQlError: GraphQLError) => {
+    /*
+    formatError: (formattedError: GraphQLFormattedError, error: unknown) => {
       // Use a better error code if possible
-      remapError(graphQlError);
+      remapError(formattedError);
       // Log all errors in full
-      LOG.error({ graphQlError });
+      LOG.error({ graphQlError: formattedError });
       // Remove the stacktrace which we never want to send to clients
       // eslint-disable-next-line no-param-reassign
-      delete graphQlError.extensions.exception;
-      return graphQlError;
+      delete formattedError.extensions.exception;
+      return formattedError;
     },
+    */
     logger: LOG,
     schema,
   });
@@ -120,6 +128,13 @@ export const createGraphqlServer = async (
     LOG.info('Shutting down graphql server');
     promises.push(server.stop());
   });
-  app.use(server.getMiddleware({ path: '/graphql', disableHealthCheck: true }));
+  app.use(
+    '/graphql',
+    cors<cors.CorsRequest>(),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }) => new RequestContext(req, res),
+    }),
+  );
   return server;
 };

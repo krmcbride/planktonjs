@@ -1,9 +1,9 @@
-import type { ApolloServer } from 'apollo-server-express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import type { Application, NextFunction, Request, Response } from 'express';
 import pino from 'express-pino-logger';
 import type { GraphQLSchema } from 'graphql';
+import type { ApolloServer } from '@apollo/server';
 import { registerHealthIndicator } from '@krmcbride/plankton-health';
 import { LoggerFactory } from '@krmcbride/plankton-logger';
 import { accessMiddlewareChainFactory } from './auth/access-middleware-chain-factory';
