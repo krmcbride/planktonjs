@@ -48,7 +48,7 @@ export const setupApp = async (
     await tryApplicationModule<RoutesCallbackArgs>('routes', async () => {})
   )({
     app,
-    access: accessMiddlewareChainFactory(config.verifierConfig),
+    access: accessMiddlewareChainFactory(config.verifier),
     graphql: async (schema: GraphQLSchema) => {
       apolloServerCb(await createGraphqlServer(app, schema));
     },

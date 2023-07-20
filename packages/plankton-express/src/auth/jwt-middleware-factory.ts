@@ -6,17 +6,11 @@ import type { RFC6750AugmentedRequest } from './rfc6750-middleware';
 
 const LOG = LoggerFactory.getLogger('plankton.express.auth.jwtMiddlewareFactory');
 
-export type VerificationConfig = {
-  auth: {
-    verifier: string;
-  };
-};
-
 // eslint-disable-next-line import/prefer-default-export
-export const jwtMiddlewareFactory = (verificationConfig: VerificationConfig): RequestHandler => {
+export const jwtMiddlewareFactory = (verifier: string): RequestHandler => {
   const jwtMiddleware = jwt({
     getToken: (req: RFC6750AugmentedRequest) => req.token,
-    secret: verificationConfig.auth.verifier,
+    secret: verifier,
     algorithms: ['RS256'],
   });
   return (req: Request, res: Response, next: NextFunction): void => {

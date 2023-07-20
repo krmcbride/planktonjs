@@ -50,7 +50,7 @@ class RequestContext implements Context {
   }
 
   access(expression: string): Promise<void> {
-    const middleware = accessMiddlewareChainFactory(config.verifierConfig)(expression);
+    const middleware = accessMiddlewareChainFactory(config.verifier)(expression);
     return new Promise((resolve, reject) => {
       middleware(this.req, this.res, (err) => {
         if (err) {

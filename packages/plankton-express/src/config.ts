@@ -8,5 +8,5 @@ export default {
   staticPaths: getProperty('PLANKTON_STATIC_PATHS', 'app/dist'),
   staticIndexFile: getProperty('PLANKTON_STATIC_INDEX_FILE', 'index.html'),
   staticIndexReqUrl: getProperty('PLANKTON_STATIC_INDEX_REQ_URL', '/'),
-  verifierConfig: getProperty('PLANKTON_AUTH_VERIFIER')
+  verifier: getProperty('PLANKTON_AUTH_VERIFIER')
 };
