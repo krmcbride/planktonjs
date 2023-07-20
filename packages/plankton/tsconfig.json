@@ -9,7 +9,6 @@
     { "path": "../plankton-emitter" },
     { "path": "../plankton-environment" },
     { "path": "../plankton-express" },
-    { "path": "../plankton-graphql" },
     { "path": "../plankton-health" },
     { "path": "../plankton-logger" }
   ]

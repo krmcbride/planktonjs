@@ -2,8 +2,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import type { Application, NextFunction, Request, Response } from 'express';
 import pino from 'express-pino-logger';
-import type { GraphQLSchema } from 'graphql';
-import type { ApolloServer } from '@apollo/server';
 import { registerHealthIndicator } from '@krmcbride/plankton-health';
 import { LoggerFactory } from '@krmcbride/plankton-logger';
 import { accessMiddlewareChainFactory } from './auth/access-middleware-chain-factory';
@@ -11,7 +9,6 @@ import type { ComponentsCallbackArgs, ParsersCallbackArgs, RoutesCallbackArgs } 
 import config from './config';
 import { defaultErrorHandlerFactory } from './default-error-handler';
 import { NotFoundError } from './errors';
-import { createGraphqlServer } from './graphql';
 import { useStatic } from './static-middleware';
 import { tryApplicationModule } from './utils';
 
@@ -19,7 +16,6 @@ import { tryApplicationModule } from './utils';
 export const setupApp = async (
   app: Application,
   frameworkRoutesCb: (app: Application) => unknown,
-  apolloServerCb: (apolloServer: ApolloServer) => unknown = () => undefined,
 ): Promise<void> => {
   await (
     await tryApplicationModule<ComponentsCallbackArgs>('components', async () => {})
@@ -49,9 +45,6 @@ export const setupApp = async (
   )({
     app,
     access: accessMiddlewareChainFactory(config.verifier),
-    graphql: async (schema: GraphQLSchema) => {
-      apolloServerCb(await createGraphqlServer(app, schema));
-    },
   });
   // Register a 404 catch-all last
   app.use((_req: Request, _res: Response, next: NextFunction) => {

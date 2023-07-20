@@ -1,5 +1,4 @@
 import type { Application, RequestHandler } from 'express';
-import type { GraphQLSchema } from 'graphql';
 import type { HealthIndicator } from '@krmcbride/plankton-health';
 
 export type ComponentsCallbackArgs = {
@@ -17,5 +16,4 @@ export type ParsersCallbackArgs = {
 export type RoutesCallbackArgs = {
   app: Application;
   access: (expression: string) => RequestHandler;
-  graphql: (schema: GraphQLSchema) => Promise<void>;
 };

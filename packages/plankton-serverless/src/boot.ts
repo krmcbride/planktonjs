@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import '@krmcbride/plankton-environment/dist/src/boot';
 
-import type { ApolloServer } from 'apollo-server-express';
 import type {
   APIGatewayProxyEvent,
   APIGatewayProxyHandler,
@@ -26,14 +25,12 @@ const handlerPromise = createHandler();
 
 export const api: APIGatewayProxyHandler & {
   app: Promise<Express>;
-  apollo: Promise<ApolloServer>;
 } = (
   event: APIGatewayProxyEvent,
   context: Context,
   callback: Callback<APIGatewayProxyResult>,
 ): Promise<APIGatewayProxyResult> => handlerPromise.then((h) => h(event, context, callback));
 api.app = handlerPromise.then((h) => h.app);
-api.apollo = handlerPromise.then((h) => h.apollo);
 
 export const preflight: Handler & { checkHealth: () => Promise<unknown> } = (event: {
   DeploymentId: string;

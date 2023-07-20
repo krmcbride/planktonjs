@@ -15,7 +15,6 @@
     "@krmcbride/plankton-emitter": "^1.0.0",
     "@krmcbride/plankton-environment": "^1.0.0",
     "@krmcbride/plankton-express": "^1.0.0",
-    "@krmcbride/plankton-graphql": "^1.0.0",
     "@krmcbride/plankton-health": "^1.0.0",
     "@krmcbride/plankton-logger": "^1.0.0",
     "tslib": "^2.3.1"

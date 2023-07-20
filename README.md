@@ -6,7 +6,6 @@ Plankton's feature set includes:
 
 - Batteries-included-but-replaceable approach to configuring [Express](https://expressjs.com/).
 - Support for running workloads in either ["server"](https://kubernetes.io/) or ["serverless"](https://www.serverless.com/) deployments.
-- A simple callback for registering [GraphQL](https://graphql.org/) schema and resolvers and configuring [Apollo](https://www.apollographql.com/) middleware along with regular Express routers.
 - Health check middleware that can be extended with custom indicators and which works in either "server" or "serverless" mode.
 - A `TypedEventEmitter` singleton for application lifecycle events.
 - A simple `LoggingFactory` and `Logger` abstraction inspired by [SLF4J](https://github.com/qos-ch/slf4j).
@@ -67,9 +66,8 @@ The recommended monorepo project structure is:
 ```
 amqp/  <------------------ Optional AMQP I/O adapters
   src/
-api/  <------------------- The service's API, consisting of Express routers and/or GraphQL resolvers
+api/  <------------------- The service's API, consisting of Express routers
   src/
-    graphql/
     routes/
 app/  <----------------- Optional Vue app
   src/
@@ -83,7 +81,7 @@ boot/  <---------------- The boot module prepares the service at runtime, with p
       local.sample.env
       index.ts  <------- All runtime configuration pulled in using plankton-environment
     routes/
-      index.ts  <------- Loaded by plankton, registers routers and GraphQLSchema from the api module
+      index.ts  <------- Loaded by plankton, registers routers from the api module
     index.ts  <--------- Service entrypoint, uses plankton's boot script (see previous section)
     parsers.ts  <------- Optional, loaded by plankton on boot to modify body parsing
 core/  <---------------- The core domain/model, i.e. the reason this service exists at all
@@ -196,113 +194,6 @@ export default async ({ app, access }: RoutesCallbackArgs) => {
   app.use('/bar', barRouterFactory(barDependency));
   app.use(errorHandler);
 };
-```
-
-### GraphQL
-
-The third `RoutesCallbackArgs` is a `graphql` function that accepts a `GraphQLSchema` and does the required Apollo middleware registration to provide the `/graphql` endpoint. The following is a `src/boot/routes.ts` implementation example using `type-graphql` and `typedi`:
-
-```typescript
-import { RoutesCallbackArgs } from '@krmcbride/plankton';
-import { buildSchema } from 'type-graphql';
-import { Container } from 'typedi';
-import resolvers from '../web/graphql/resolvers';
-
-export default async ({ graphql }: RoutesCallbackArgs) => {
-  await graphql(
-    await buildSchema({
-      resolvers,
-      container: Container,
-    }),
-  );
-};
-```
-
-Both regular Express routers and GraphQL can be used in the same service:
-
-```typescript
-export default async ({ app, graphql }: RoutesCallbackArgs) => {
-  graphql(await getGraphqlSchema());
-  app.use('/foo', fooRouterFactory(bar, baz));
-};
-```
-
-### GraphQL Relay Connections (pagination)
-
-A [TypeGraphQL](https://typegraphql.com/) implementation of the [Relay Connection](https://relay.dev/graphql/connections.htm) specification for [GraphQL pagination](https://graphql.org/learn/pagination/) is available from the main module:
-
-```typescript
-import { graphql } from '@krmcbride/plankton';
-
-// An Edge wraps a Node and a cursor (in this example our Node is a Pet).
-@ObjectType({ description: 'Pet edge' })
-class PetEdge extends graphql.EdgeType('pet', Pet) {}
-
-// The Connection uses pagination ConnectionArgs to fetch Edges
-@ObjectType({ description: 'Pet connection' })
-class PetConnection extends graphql.ConnectionType<PetEdge>('pet', PetEdge) {}
-
-// Regular schema object
-@ObjectType({ description: 'Pet' })
-class Pet {
-  @Field(() => String)
-  name!: string;
-}
-
-// Regular schema object with a PetConnection field
-@ObjectType({ description: 'Pet Store' })
-class PetStore {
-  @Field(() => String)
-  address!: string;
-
-  @Field(() => PetConnection)
-  pets?: PetConnection;
-}
-
-// Regular resolver and field resolver that maps the ConnectionArgs into a backend query.
-@Service()
-@Resolver(PetStore)
-class PetStoreResolver {
-  // ...
-  @FieldResolver(() => PetConnection)
-  async pets(
-    @Root() petStore: PetStore,
-    @Args() connectionArgs: graphql.ConnectionArgs,
-  ): Promise<PetConnection> {
-    // ...
-  }
-}
-```
-
-Example query:
-
-```graphql
-query PetStoreByAddress($address: String!, $first: Float, $after: String) {
-  petStore(address: $address) {
-    address
-    # The possible Connection pagination args are first, last, before and after
-    # "First 10" is like "limit 10".
-    # "First 10 after <cursor>" is like "offset <cursor> limit 10".
-    # A cursor is typically a base64 encoded JSON object containing the node's
-    # ID but the client should treat it as an opaque string.
-    pets(first: $first, after: $after) {
-      # An edge is a wrapper for the connected node and its cursor
-      edges {
-        # In this instance this is the Pet
-        node {
-          name # The pet name
-        }
-        cursor # An opaque string that can be used as $after or $before, like an offset
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-    }
-  }
-}
 ```
 
 ## Environment
