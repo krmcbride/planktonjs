@@ -1,6 +1,6 @@
 {
   "name": "@krmcbride/plankton-amqp",
-  "version": "1.0.0",
+  "version": "1.0.0-rc.0",
   "license": "MIT",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -17,9 +17,9 @@
     "clean": "rimraf ./dist"
   },
   "dependencies": {
-    "@krmcbride/plankton-emitter": "^1.0.0",
-    "@krmcbride/plankton-health": "^1.0.0",
-    "@krmcbride/plankton-logger": "^1.0.0",
+    "@krmcbride/plankton-emitter": "^1.0.0-rc.0",
+    "@krmcbride/plankton-health": "^1.0.0-rc.0",
+    "@krmcbride/plankton-logger": "^1.0.0-rc.0",
     "amqp-connection-manager": "^4.1.1",
     "amqplib": "^0.8.0",
     "tslib": "^2.3.1"
