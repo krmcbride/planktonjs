@@ -1,6 +1,6 @@
 {
   "name": "@krmcbride/plankton-server",
-  "version": "1.0.0-rc.0",
+  "version": "1.0.0-rc.1",
   "license": "MIT",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "@godaddy/terminus": "^4.10.2",
-    "@krmcbride/plankton-emitter": "^1.0.0-rc.0",
-    "@krmcbride/plankton-environment": "^1.0.0-rc.0",
-    "@krmcbride/plankton-express": "^1.0.0-rc.0",
-    "@krmcbride/plankton-health": "^1.0.0-rc.0",
-    "@krmcbride/plankton-logger": "^1.0.0-rc.0",
+    "@krmcbride/plankton-emitter": "^1.0.0-rc.1",
+    "@krmcbride/plankton-environment": "^1.0.0-rc.1",
+    "@krmcbride/plankton-express": "^1.0.0-rc.1",
+    "@krmcbride/plankton-health": "^1.0.0-rc.1",
+    "@krmcbride/plankton-logger": "^1.0.0-rc.1",
     "@types/stoppable": "^1.1.1",
     "bluebird": "^3.7.2",
     "tslib": "^2.3.1"
