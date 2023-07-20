@@ -1,0 +1,8 @@
+# This workflow runs on every push
+name: lib-push
+on: [push]
+jobs:
+  lib:
+    uses: ./.github/workflows/lib-build.yml
+    secrets:
+      GH_NPM_TOKEN: '${{secrets.GH_NPM_TOKEN}}'

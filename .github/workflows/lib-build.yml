@@ -1,0 +1,61 @@
+# This is a callable workflow intended to build and publish npm packages
+name: lib-build
+on:
+  workflow_call:
+    secrets:
+      GH_NPM_TOKEN:
+        description: The GitHub npm token
+        required: true
+env:
+  npm_config_always_auth: 'true'
+  npm_config_email: 681929+krmcbride@users.noreply.github.com
+  GH_NPM_TOKEN: '${{secrets.GH_NPM_TOKEN}}'
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node: [14, 16]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+          registry-url: https://npm.pkg.github.com/
+      - run: |
+          npm install -g npm@8.5.5
+        if: matrix.node == 14
+      - run: |
+          npm --version
+      - run: npm install
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run test-ci
+      - run: npx lerna publish from-package --yes
+        if: matrix.node == 14 && startsWith(github.ref, 'refs/tags/')
+  release:
+    needs: build
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prerelease tag check
+        id: tag_check
+        run: |
+          if [[ ${{ github.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo ::set-output name=prerelease::false
+          else
+              echo ::set-output name=prerelease::true
+          fi
+      - uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body_path: ${{ github.workspace }}/RELEASE.md
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ steps.tag_check.outputs.prerelease }}
