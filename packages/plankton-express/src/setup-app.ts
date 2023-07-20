@@ -44,7 +44,11 @@ export const setupApp = async (
     await tryApplicationModule<RoutesCallbackArgs>('routes', async () => {})
   )({
     app,
-    access: accessMiddlewareChainFactory(config.verifier),
+    access: config.verifier
+      ? accessMiddlewareChainFactory(config.verifier)
+      : () => {
+          throw new Error('No JWT verifier is configured');
+        },
   });
   // Register a 404 catch-all last
   app.use((_req: Request, _res: Response, next: NextFunction) => {
