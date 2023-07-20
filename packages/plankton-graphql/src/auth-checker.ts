@@ -1,4 +1,4 @@
-import { AuthenticationError, ForbiddenError } from 'apollo-server-errors';
+import { GraphQLError } from 'graphql';
 import type { AuthChecker } from 'type-graphql';
 import type Context from './context';
 
@@ -28,10 +28,20 @@ const doAccess = async (access: () => Promise<void>): Promise<boolean> => {
       message: httpClientError.message,
     };
     if (statusCode === 403) {
-      throw new ForbiddenError(message, extensions);
+      throw new GraphQLError(message, {
+        extensions: {
+          code: 'FORBIDDEN',
+          extensions,
+        },
+      });
     }
     if (statusCode === 401) {
-      throw new AuthenticationError(message, extensions);
+      throw new GraphQLError(message, {
+        extensions: {
+          code: 'UNAUTHENTICATED',
+          extensions,
+        },
+      });
     }
     throw err;
   }
