@@ -1,6 +1,6 @@
 {
   "name": "@krmcbride/plankton-work-queue",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "license": "MIT",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -17,11 +17,11 @@
     "clean": "rimraf ./dist"
   },
   "dependencies": {
-    "@krmcbride/plankton-data-commons": "^1.0.0-rc.1",
-    "@krmcbride/plankton-data-mongodb": "^1.0.0-rc.1",
-    "@krmcbride/plankton-emitter": "^1.0.0-rc.1",
-    "@krmcbride/plankton-health": "^1.0.0-rc.1",
-    "@krmcbride/plankton-logger": "^1.0.0-rc.1",
+    "@krmcbride/plankton-data-commons": "^1.0.0-rc.2",
+    "@krmcbride/plankton-data-mongodb": "^1.0.0-rc.2",
+    "@krmcbride/plankton-emitter": "^1.0.0-rc.2",
+    "@krmcbride/plankton-health": "^1.0.0-rc.2",
+    "@krmcbride/plankton-logger": "^1.0.0-rc.2",
     "node-fetch": "^3.2.3",
     "tslib": "^2.3.1"
   },
