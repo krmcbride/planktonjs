@@ -5,8 +5,7 @@ Plankton, originally inspired by [Spring Boot](https://spring.io/projects/spring
 Plankton's feature set includes:
 
 - Batteries-included-but-replaceable approach to configuring [Express](https://expressjs.com/).
-- Support for running workloads in either ["server"](https://kubernetes.io/) or ["serverless"](https://www.serverless.com/) deployments.
-- Health check middleware that can be extended with custom indicators and which works in either "server" or "serverless" mode.
+- Health check middleware that can be extended with custom indicators
 - A `TypedEventEmitter` singleton for application lifecycle events.
 - A simple `LoggingFactory` and `Logger` abstraction inspired by [SLF4J](https://github.com/qos-ch/slf4j).
 - Utilities for safely pulling configuration in from environment variables.
@@ -16,45 +15,14 @@ Plankton's feature set includes:
 
 ## Quick Start
 
-Most projects will need to install `@krmcbride/plankton`, and one of `@krmcbride/plankton-serverless` or `@krmcbride/plankton-server`.
+Most projects will need to install `@krmcbride/plankton`, and `@krmcbride/plankton-server`.
 
-### Serverless deployment
-
-To boot your service in "serverless" mode (to be invoked by Lambda using Serverless Framework) create a `boot/src/index.ts` file with the following:
-
-```typescript
-export { api, preflight } from '@krmcbride/plankton-serverless/dist/src/boot';
-```
-
-The `functions` snippet of `serverless.yml` would look like the following, assuming `serverless-plugin-canary-deployments` is used with the preflight check:
-
-```yaml
-functions:
-  api:
-    handler: boot/dist/src.api
-    events:
-      - http:
-          method: any
-          path: /${self:service}/{proxy+}
-          cors: true
-      - http:
-          method: any
-          path: /${self:service}/
-          cors: true
-    deploymentSettings:
-      type: ${self:custom.${self:custom.stage}.deploymentType}
-      alias: live
-      preTrafficHook: preflight
-  preflight:
-    handler: boot/dist/src.preflight
-```
-
-### Server deployment
+### Server bootstrapping
 
 To boot your service in "server" mode (to run in a Kubernetes pod for instance) create a `boot/src/index.ts` file with the following:
 
 ```typescript
-import '@krmcbride/plankton-serverless/dist/src/boot';
+import '@krmcbride/plankton-server/dist/src/boot';
 ```
 
 The server entrypoint after compilation would be `boot/dist/src`.
@@ -198,7 +166,7 @@ export default async ({ app, access }: RoutesCallbackArgs) => {
 
 ## Environment
 
-> See `packages/plankton-server/src/server/config.ts` or `packages/plankton-serverless/src/serverless/config.ts` for plankton's default configurations.
+> See `packages/plankton-server/src/server/config.ts` for plankton's default configurations.
 
 All configuration should be provided via environment variables. In non-production settings plankton will use [`dotenv`](https://github.com/motdotla/dotenv) to load the project's `src/boot/config/local.env` file if it exists, which should be used to set local development environment variables.
 
@@ -235,75 +203,7 @@ export default {
 };
 ```
 
-### Encrypted properties
-
-In some deployments, namely serverless lambda deployments, the recommended approach to handling secrets is through encrypted environment variables (called "encryption in transit" in the AWS literature). Plankton's `environment` module provides a `getPropertyAsSecret` method to assist in these cases. Unlike the other property methods which synchronously return a static value, decrypting encrypted environment variables requires a call out to [KMS](https://aws.amazon.com/kms/) which would have the domino effect of causing the configuration verification step in the application bootstrap to be asynchronous, which increases complexity, ruining the benefits of relying on static environment variables.
-
-To mitigate this, `getPropertyAsSecret` synchronously returns a `Secret`, which is a wrapper object with a lone `decrypt` function that returns a `Promise<string>`. This allows synchronous verification that an environment variable is set, and lazy decryption during later application initialization.
-
-A simple `src/boot/config/index.ts` example:
-
-```typescript
-import { environment } from '@krmcbride/plankton';
-
-export default {
-  mongodb: {
-    uri: environment.getPropertyAsSecret('mongodb.uri'),
-  },
-};
-```
-
-In `src/boot/components/mongo-client-factory.ts` using the secret looks like:
-
-```typescript
-import { mongoClientFactory } from '@krmcbride/plankton-data-mongodb';
-import config from '../config';
-
-export const mongoClientPromise = (async () =>
-  mongoClientFactory({ uri: await config.mongodb.uri.decrypt() }))();
-```
-
-Since Plankton's `components` loading stage is asynchronous (and so is connecting to MongoDB), waiting for decryption here does not require any sync/async changes, but still happens early enough that a health check can quickly determine if the decrypted value is actually correct.
-
-There are two scenarios where having to make a call to KMS to do decryption is unnecessarily complex and a regular static environment variable would be sufficient: local development and tests. To support this, `getPropertyAsSecret` will operate in "passthrough" mode when either the `IS_OFFLINE` environment variable is set (as is done by the `serverless-offline` plugin) or when the `NODE_ENV` is `test`. In "passthrough" mode, the raw value of the environment variable is passed through without alteration, and without invoking KMS. This allows regular static environment variables to be set in a project's `local.env` and `test.env`.
-
-#### How To Encrypt Things:
-
-Encryption Prerequisites:
-
-- You must have `kms:Encrypt` access to the same KMS key that the service has `kms:Decrypt` access to (because...that's how it works).
-- You must have said KMS key's ID.
-
-Suppose you want to encrypt a super secret password like "password":
-
-1. `base64` it
-
-```bash
- > echo -n password | base64
- cGFzc3dvcmQ=
-```
-
-2. Say you have an AWS profile called `foo` that can access the an AWS account's lambda KMS key (the key lambda functions are configured to `kms:Decrypt` with). Using the KMS key's ID, to encrypt:
-
-```bash
-> AWS_PROFILE=foo \
-      aws kms encrypt --region us-west-2 \
-      --key-id bc377a31-958d-4fb6-b630-a00ae1cac09f \
-      --plaintext cGFzc3dvcmQ=
-{
-  "CiphertextBlob": "AQICAHggUGvMDbVvkjGlGb0fFwJYVKY3AT3C4ilvrGp5ZbAfNAET1xmXAfvcmdDzcv0NquHvAAAAZjBkBgkqhkiG9w0BBwagVzBVAgEAMFAGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMfrJON686quzOgpWtAgEQgCPNfk4c9g2MtmFi/RCvxKCsVL3HDOedXyG7fKLW6MbRTUKWmQ==",
-  "KeyId": "arn:aws:kms:us-west-2:1234567890:key/bc377a31-958d-4fb6-b630-a00ae1cac09f",
-  "EncryptionAlgorithm": "SYMMETRIC_DEFAULT"
-}
-```
-
-3. Copy that `CiphertextBlob` into an environment variable or wherever it needs to go.
-
-To decrypt use: `aws kms decrypt --region us-west-2 --ciphertext-blob <theCiphertextBlobValue>`. This is essentially what `Secret.decrypt` is doing.
-
 ## Typed Event emitter
-
-> The `started` and `shutdown` events are not currently emitted when running in "serverless" mode.
 
 The standard nodejs [`EventEmitter`](https://nodejs.org/api/events.html#class-eventemitter) is great and plankton creates and exports a singleton instance for itself and applications to use.
 
