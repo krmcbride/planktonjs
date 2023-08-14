@@ -5,12 +5,8 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "files": [
-    "bin/",
     "dist/"
   ],
-  "bin": {
-    "plankton-express-print-schema": "./bin/print-schema.js"
-  },
   "repository": "https://github.com/krmcbride/planktonjs",
   "publishConfig": {
     "@krmcbride:registry": "https://npm.pkg.github.com"
@@ -25,10 +21,10 @@
     "connect-sequence": "^2.1.1",
     "cookie-parser": "^1.4.3",
     "express-jwt": "^8.4.1",
-    "express-pino-logger": "^7.0.0",
-    "ipaddr.js": "^2.0.1",
+    "ipaddr.js": "^2.1.0",
     "lodash": "^4.17.21",
-    "tslib": "^2.3.1"
+    "pino-http": "^8.3.3",
+    "tslib": "^2.6.0"
   },
   "peerDependencies": {
     "express": "^4.18.2",
@@ -38,7 +34,6 @@
   "devDependencies": {
     "@types/app-root-path": "^1.2.4",
     "@types/connect-sequence": "^2.1.0",
-    "@types/cors": "^2.8.13",
     "@types/lodash": "^4.14.180"
   },
   "scripts": {

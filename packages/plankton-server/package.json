@@ -24,18 +24,17 @@
     "@krmcbride/plankton-logger": "^1.0.0-rc.2",
     "@types/stoppable": "^1.1.1",
     "bluebird": "^3.7.2",
-    "tslib": "^2.3.1"
+    "tslib": "^2.6.0"
   },
   "peerDependencies": {
     "express": "^4.18.2",
-    "prom-client": "^14.0.1",
+    "prom-client": "^14.2.0",
     "reflect-metadata": "^0.1.13"
   },
   "peerDependenciesMeta": {},
   "devDependencies": {
     "@types/bluebird": "^3.5.36",
-    "@types/cookie-parser": "^1.4.2",
-    "@types/express-pino-logger": "^4.0.3"
+    "@types/cookie-parser": "^1.4.2"
   },
   "scripts": {
     "build": "npm run clean && npm run build-ts",

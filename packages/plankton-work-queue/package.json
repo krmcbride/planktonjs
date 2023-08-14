@@ -23,9 +23,9 @@
     "@krmcbride/plankton-health": "^1.0.0-rc.2",
     "@krmcbride/plankton-logger": "^1.0.0-rc.2",
     "node-fetch": "^3.2.3",
-    "tslib": "^2.3.1"
+    "tslib": "^2.6.0"
   },
   "peerDependencies": {
-    "mongodb": "^4.4.1"
+    "mongodb": "~5.7.0"
   }
 }
