@@ -1,6 +1,5 @@
 import assert from 'assert';
 import { isBoolean, isString } from 'lodash';
-import { Secret, wrap } from './kms';
 
 const isTruthular = (value?: string): boolean => {
   if (value === undefined) {
@@ -75,24 +74,4 @@ export const getPropertyAsObject = <T>(key: string, defVal?: T): T => {
   // Sanity check
   assert(isString(value), `Property ${key} has non-string value ${value}`);
   return JSON.parse(value);
-};
-
-export const getPropertyAsSecret = (
-  key: string,
-  defVal?: string,
-  passthrough?: boolean,
-): Secret => {
-  const value = fromEnv(key);
-  if (value === undefined) {
-    assert(defVal !== undefined, `Property ${key} not found and no default value given`);
-    return { decrypt: () => Promise.resolve(defVal) };
-  }
-  // Sanity check
-  assert(isString(value), `Property ${key} has non-string value ${value}`);
-  return wrap(
-    value,
-    passthrough === undefined
-      ? process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development'
-      : passthrough,
-  );
 };
